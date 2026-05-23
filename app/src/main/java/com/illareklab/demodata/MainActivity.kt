@@ -3,45 +3,49 @@ package com.illareklab.demodata
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.illareklab.demodata.ui.theme.DemoDataTheme
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.illareklab.demodata.ui.Navigation
+import com.illareklab.demodata.ui.theme.AppTheme
+import com.illareklab.demodata.ui.viewmodel.SessionViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            DemoDataTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            val app = applicationContext as DemoDataApp
+            val sessionVm: SessionViewModel = viewModel(
+                factory = SessionViewModel.Factory(app.sessionManager)
+            )
+            
+            val isDarkModePref by sessionVm.isDarkMode.collectAsState()
+            val darkTheme = isDarkModePref ?: isSystemInDarkTheme()
+
+            AppTheme(darkTheme = darkTheme) {
+                Navigation()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DemoDataTheme {
-        Greeting("Android")
-    }
-}
+//
+//import android.os.Bundle
+//import androidx.activity.ComponentActivity
+//import androidx.activity.compose.setContent
+//import androidx.compose.material3.MaterialTheme
+//import com.illareklab.demodata.ui.Navigation
+//import com.illareklab.demodata.ui.theme.AppTheme
+//
+//class MainActivity : ComponentActivity() {
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContent {
+//            AppTheme {
+//                // El entry point cede el control al módulo de enrutamiento gráfico
+//                Navigation()
+//            }
+//        }
+//    }
+//}
