@@ -1,8 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    // alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
+//    alias(libs.plugins.kotlin.)
+    // alias(libs.plugins.kotlin.android)
+//    alias(libs.plugins.ksp)
+//    alias(libs.plugins.kotlin.kapt)
+//    id("kotlin-kapt")
+//    id("com.google.devtools.ksp") // Asegúrate de tener el plugin de KSP activo
 }
 
 android {
@@ -41,6 +46,11 @@ android {
     }
 }
 
+ksp {
+    arg("room.generateKotlin", "true")
+    arg("useK2", "true")
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -67,11 +77,10 @@ dependencies {
 
     // lab 4 libraries
 
-    // ── Room (SQLite) ──
-    val roomVersion = "2.6.1"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    ksp("androidx.room:room-compiler:$roomVersion")
+    // ── Room (SQLite) ── Modernizado con libs.versions.toml ──
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     // ── DataStore (Preferences) ──
     implementation("androidx.datastore:datastore-preferences:1.1.1")
@@ -82,6 +91,7 @@ dependencies {
 
     // ── Hardware: ubicación de Google (Fused Location Provider) ──
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
 
     // ── WorkManager: tareas diferidas y persistentes ──
     implementation("androidx.work:work-runtime-ktx:2.9.0")
