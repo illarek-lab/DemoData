@@ -225,6 +225,7 @@ private fun MyProfileScreen(
         
         ProfileMetadataItem("Username", username ?: "N/A")
         ProfileMetadataItem("Rol", "Administrador / Operador")
+        ProfileMetadataItem("Directorio Local", LocalContext.current.filesDir.absolutePath)
 
         // ── Opción Modo Noche ──
         Row(
