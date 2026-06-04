@@ -63,7 +63,9 @@ fun ProfileScreen(
             onLogout = onLogout,
             onNavigateToProfile = { viewState = ProfileViewState.MyProfile },
             onNavigateToLocal = { viewState = ProfileViewState.LocalRecords },
-            onNavigateToAll = { viewState = ProfileViewState.AllRecords }
+            onNavigateToAll = { viewState = ProfileViewState.AllRecords },
+            onNavigateToSync = { viewState = ProfileViewState.Sync },
+            onNavigateToNotifications = { viewState = ProfileViewState.Notifications }
         )
         ProfileViewState.MyProfile -> MyProfileScreen(
             username = username,
@@ -80,6 +82,14 @@ fun ProfileScreen(
             allowedSource = RecordsSource.ALL,
             onBack = { viewState = ProfileViewState.Menu }
         )
+        ProfileViewState.Sync -> NestedScreen(
+            title = "Sincronización",
+            onBack = { viewState = ProfileViewState.Menu }
+        ) { SyncScreen() }
+        ProfileViewState.Notifications -> NestedScreen(
+            title = "Notificaciones",
+            onBack = { viewState = ProfileViewState.Menu }
+        ) { NotificationsScreen() }
     }
 }
 
@@ -88,6 +98,8 @@ private sealed class ProfileViewState {
     object MyProfile : ProfileViewState()
     object LocalRecords : ProfileViewState()
     object AllRecords : ProfileViewState()
+    object Sync : ProfileViewState()
+    object Notifications : ProfileViewState()
 }
 
 @Composable
@@ -96,7 +108,9 @@ private fun ProfileMenu(
     onLogout: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToLocal: () -> Unit,
-    onNavigateToAll: () -> Unit
+    onNavigateToAll: () -> Unit,
+    onNavigateToSync: () -> Unit,
+    onNavigateToNotifications: () -> Unit
 ) {
     var mostrarConfirmacion by remember { mutableStateOf(false) }
 
@@ -136,6 +150,20 @@ private fun ProfileMenu(
             title = "Todos los registros",
             subtitle = "Explorador local + nube (API)",
             onClick = onNavigateToAll
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        MenuOption(
+            icon = Icons.Default.CloudSync,
+            title = "Sincronización",
+            subtitle = "Subir registros al servidor remoto",
+            onClick = onNavigateToSync
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        MenuOption(
+            icon = Icons.Default.Notifications,
+            title = "Notificaciones",
+            subtitle = "Programar y gestionar notificaciones",
+            onClick = onNavigateToNotifications
         )
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -252,6 +280,21 @@ private fun RecordsExplorerScreen(
 
     if (detailItem != null) {
         ActivityDetailDialog(item = detailItem!!, onDismiss = { detailItem = null })
+    }
+}
+
+@Composable
+private fun NestedScreen(title: String, onBack: () -> Unit, content: @Composable () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(onClick = onBack) { Text("← Volver") }
+            Text(title, style = MaterialTheme.typography.titleMedium)
+        }
+        HorizontalDivider()
+        content()
     }
 }
 

@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -64,8 +62,6 @@ private fun MainScaffold(sessionVm: SessionViewModel) {
                     "gps"     to (Icons.Default.LocationOn   to "GNSS"),
                     "media"   to (Icons.Default.CameraAlt    to "Media"),
                     "audio"   to (Icons.Default.Mic          to "Audio"),
-                    "sync"    to (Icons.Default.CloudSync    to "Sync"),
-                    "notif"   to (Icons.Default.Notifications to "Notif"),
                     "profile" to (Icons.Default.Person       to "Perfil")
                 )
                 tabs.forEachIndexed { idx, (route, iconLabel) ->
@@ -91,8 +87,6 @@ private fun MainScaffold(sessionVm: SessionViewModel) {
             composable("gps") { GpsScreen() }
             composable("media") { MediaScreen() }
             composable("audio") { AudioScreen() }
-            composable("sync") { SyncScreen() }
-            composable("notif") { NotificationsScreen() }
             composable("profile") { ProfileScreen(onLogout = sessionVm::logout, username = username) }
         }
     }
