@@ -339,9 +339,14 @@ private fun MyProfileScreen(username: String?, sessionVm: SessionViewModel, onBa
         }
         HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
+        val androidId = android.provider.Settings.Secure.getString(
+            LocalContext.current.contentResolver,
+            android.provider.Settings.Secure.ANDROID_ID
+        )
         ProfileMetadataItem("Dispositivo", "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
         ProfileMetadataItem("Android Version", android.os.Build.VERSION.RELEASE)
         ProfileMetadataItem("API Level", android.os.Build.VERSION.SDK_INT.toString())
+        ProfileMetadataItem("Android ID", androidId ?: "N/A")
         Spacer(modifier = Modifier.height(32.dp))
         Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Volver") }
     }
