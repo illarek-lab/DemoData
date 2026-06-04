@@ -53,7 +53,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = usuario,
             onValueChange = { usuario = it },
-            label = { Text("Usuario") },
+            label = { Text("Email") },
             singleLine = true,
             enabled = !verificando,
             modifier = Modifier.fillMaxWidth()
@@ -82,7 +82,7 @@ fun LoginScreen(
                 verificando = true
                 onSubmit(usuario, password) { ok ->
                     verificando = false
-                    if (!ok) error = "Credenciales incorrectas. Pruebe jkn/jkn."
+                    if (!ok) error = "Credenciales incorrectas. Revisa tu email y contraseña."
                 }
             },
             enabled = !verificando && usuario.isNotBlank() && password.isNotBlank(),
@@ -103,7 +103,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Credenciales por defecto: jkn / jkn",
+            "Usa tus credenciales de Platform API",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline
         )
