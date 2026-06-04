@@ -1,6 +1,8 @@
 package com.illareklab.demodata.data.session
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.provider.Settings
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -20,6 +22,8 @@ class SessionManager(private val context: Context) {
     private companion object {
         val KEY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         val KEY_USERNAME = stringPreferencesKey("username")
+        val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
+        val KEY_REFRESH_TOKEN = stringPreferencesKey("refresh_token")
         val KEY_DARK_MODE = booleanPreferencesKey("dark_mode")
     }
 
@@ -30,13 +34,33 @@ class SessionManager(private val context: Context) {
     val currentUsername: Flow<String?> = context.sessionDataStore.data
         .map { prefs -> prefs[KEY_USERNAME] }
 
+    val accessToken: Flow<String?> = context.sessionDataStore.data
+        .map { prefs -> prefs[KEY_ACCESS_TOKEN] }
+
+    val refreshToken: Flow<String?> = context.sessionDataStore.data
+        .map { prefs -> prefs[KEY_REFRESH_TOKEN] }
+
     val isDarkMode: Flow<Boolean?> = context.sessionDataStore.data
         .map { prefs -> prefs[KEY_DARK_MODE] }
 
-    suspend fun login(username: String) {
+    @SuppressLint("HardwareIds")
+    fun getDeviceId(): String {
+        return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "unknown_device"
+    }
+
+    suspend fun login(username: String, access: String, refresh: String) {
         context.sessionDataStore.edit { prefs ->
             prefs[KEY_IS_LOGGED_IN] = true
             prefs[KEY_USERNAME] = username
+            prefs[KEY_ACCESS_TOKEN] = access
+            prefs[KEY_REFRESH_TOKEN] = refresh
+        }
+    }
+
+    suspend fun updateTokens(access: String, refresh: String) {
+        context.sessionDataStore.edit { prefs ->
+            prefs[KEY_ACCESS_TOKEN] = access
+            prefs[KEY_REFRESH_TOKEN] = refresh
         }
     }
 
@@ -48,7 +72,6 @@ class SessionManager(private val context: Context) {
 
     suspend fun logout() {
         context.sessionDataStore.edit { prefs ->
-            // No borramos la preferencia de tema al cerrar sesión para persistir el gusto del usuario
             val currentTheme = prefs[KEY_DARK_MODE]
             prefs.clear()
             if (currentTheme != null) prefs[KEY_DARK_MODE] = currentTheme
