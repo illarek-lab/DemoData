@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.illareklab.demodata.DemoDataApp
 import com.illareklab.demodata.ui.screens.*
@@ -29,12 +30,52 @@ fun Navigation() {
         factory = SessionViewModel.Factory(app.sessionManager)
     )
 
+    val rootNavController = rememberNavController()
     val isLoggedIn by sessionVm.isLoggedIn.collectAsStateWithLifecycle()
 
-    if (isLoggedIn) {
-        MainScaffold(sessionVm)
-    } else {
-        LoginScreen(onSubmit = sessionVm::login)
+    // Decidimos la pantalla raíz basándonos en el estado de login
+    // Usamos LaunchedEffect para navegar automáticamente cuando cambie isLoggedIn
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            rootNavController.navigate("main") {
+                popUpTo("auth") { inclusive = true }
+            }
+        } else {
+            rootNavController.navigate("auth") {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
+    NavHost(
+        navController = rootNavController,
+        startDestination = if (isLoggedIn) "main" else "auth"
+    ) {
+        // Grafo de Autenticación
+        navigation(startDestination = "login", route = "auth") {
+            composable("login") {
+                LoginScreen(
+                    onSubmit = sessionVm::login,
+                    onRegisterNavigate = { rootNavController.navigate("register") }
+                )
+            }
+            composable("register") {
+                RegisterScreen(
+                    onBack = { rootNavController.popBackStack() },
+                    onSubmit = { email, pass, onResult ->
+                        sessionVm.register(email, pass) { success ->
+                            onResult(success)
+                            if (success) rootNavController.popBackStack()
+                        }
+                    }
+                )
+            }
+        }
+
+        // Pantalla Principal (Scaffold con Tabs)
+        composable("main") {
+            MainScaffold(sessionVm)
+        }
     }
 }
 

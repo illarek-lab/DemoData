@@ -59,6 +59,27 @@ class SessionViewModel(
         }
     }
 
+    fun register(email: String, password: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.apiService.register(
+                    projectSlug = NetworkConstants.PROJECT_SLUG,
+                    request = RegisterRequest(email, password)
+                )
+
+                if (response.isSuccessful) {
+                    // Después de registrar, hacemos login automático o pedimos que inicie sesión
+                    // Por ahora solo notificamos éxito
+                    onResult(true)
+                } else {
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                onResult(false)
+            }
+        }
+    }
+
     fun loginWithGoogle(googleToken: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {

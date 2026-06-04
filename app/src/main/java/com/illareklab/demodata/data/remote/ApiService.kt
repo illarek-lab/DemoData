@@ -7,6 +7,12 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
+    @POST("{projectSlug}/auth/register")
+    suspend fun register(
+        @Path("projectSlug") projectSlug: String,
+        @Body request: RegisterRequest
+    ): Response<Unit>
+
     @POST("{projectSlug}/auth/login")
     suspend fun login(
         @Path("projectSlug") projectSlug: String,
