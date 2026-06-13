@@ -64,7 +64,6 @@ fun AudioScreen() {
     val audios by vm.audios.collectAsStateWithLifecycle()
     val isRecording by vm.isRecording.collectAsStateWithLifecycle()
     val elapsedSeconds by vm.elapsedSeconds.collectAsStateWithLifecycle()
-
     val micPermission = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
 
     Column(

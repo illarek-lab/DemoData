@@ -14,7 +14,7 @@ import javax.crypto.spec.PBEKeySpec
 object PasswordHasher {
 
     private const val ALGORITMO = "PBKDF2WithHmacSHA256"
-    private const val ITERACIONES = 120_000
+    private const val ITERACIONES = 600_000
     private const val LONGITUD_HASH_BITS = 256
 
     /**
