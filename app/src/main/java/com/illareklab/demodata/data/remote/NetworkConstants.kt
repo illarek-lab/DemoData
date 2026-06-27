@@ -5,6 +5,7 @@ object NetworkConstants {
      * URL base para los endpoints de la API.
      * Descomenta la que desees utilizar.
      */
+    //const val BASE_URL = "http://192.168.1.38:8000/"
     const val BASE_URL = "https://platform-api.kankunapaq.com/"
     // const val BASE_URL = "http://illarek.org/"
 
