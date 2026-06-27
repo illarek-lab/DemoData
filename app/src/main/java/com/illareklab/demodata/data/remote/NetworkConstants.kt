@@ -13,4 +13,10 @@ object NetworkConstants {
      * Slug del proyecto (tenant) para las peticiones multi-tenant.
      */
     const val PROJECT_SLUG = "layout_example" // Cambiar según el proyecto
+
+    /**
+     * Client ID de Google para la autenticación.
+     * Reemplaza esto con tu Web Client ID de la consola de Google Cloud.
+     */
+    const val GOOGLE_WEB_CLIENT_ID = "1059503073483-33q7cppd0a7sarfqg61ped6da0f9l376.apps.googleusercontent.com"
 }
