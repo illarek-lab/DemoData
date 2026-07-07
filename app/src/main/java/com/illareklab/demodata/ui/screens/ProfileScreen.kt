@@ -319,11 +319,13 @@ private fun MenuOption(icon: ImageVector, title: String, subtitle: String, onCli
 @Composable
 private fun MyProfileScreen(username: String?, sessionVm: SessionViewModel, onBack: () -> Unit) {
     val isDarkModePref by sessionVm.isDarkMode.collectAsStateWithLifecycle()
+    val userId by sessionVm.userId.collectAsStateWithLifecycle()
     val isDark = isDarkModePref ?: isSystemInDarkTheme()
     Column(modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState())) {
         Text("Mi Perfil", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(24.dp))
         ProfileMetadataItem("Username", username ?: "N/A")
+        ProfileMetadataItem("User ID (UUID)", userId ?: "Cargando...")
         ProfileMetadataItem("Rol", "Administrador / Operador")
         ProfileMetadataItem("Directorio Local", LocalContext.current.filesDir.absolutePath)
         Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
