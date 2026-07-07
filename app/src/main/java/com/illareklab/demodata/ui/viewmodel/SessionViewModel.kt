@@ -80,7 +80,7 @@ class SessionViewModel(
         }
     }
 
-    fun loginWithGoogle(googleToken: String, onResult: (Boolean) -> Unit) {
+    fun loginWithGoogle(googleToken: String, email: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.apiService.loginWithGoogle(
@@ -93,7 +93,8 @@ class SessionViewModel(
 
                 if (response.isSuccessful && response.body() != null) {
                     val body = response.body()!!
-                    sessionManager.login("Google User", body.accessToken, body.refreshToken)
+                    // Guardamos el email real en lugar de "Google User"
+                    sessionManager.login(email, body.accessToken, body.refreshToken)
                     onResult(true)
                 } else {
                     onResult(false)

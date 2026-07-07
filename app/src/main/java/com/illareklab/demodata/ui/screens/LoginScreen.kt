@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     onSubmit: (username: String, password: String, onResult: (Boolean) -> Unit) -> Unit,
-    onGoogleLogin: (token: String, onResult: (Boolean) -> Unit) -> Unit,
+    onGoogleLogin: (token: String, email: String, onResult: (Boolean) -> Unit) -> Unit,
     onRegisterNavigate: () -> Unit
 ) {
     val context = LocalContext.current
@@ -48,9 +48,13 @@ fun LoginScreen(
         val credential = result.credential
         if (credential is CustomCredential &&
             credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            val idToken = GoogleIdTokenCredential.createFrom(credential.data).idToken
+            val googleCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            val idToken = googleCredential.idToken
+            // Obtenemos el email como identificador
+            val email = googleCredential.id
+
             verificando = true
-            onGoogleLogin(idToken) { success ->
+            onGoogleLogin(idToken, email) { success ->
                 verificando = false
                 if (!success) error = "El servidor no reconoció la cuenta de Google"
             }
