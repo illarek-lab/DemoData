@@ -34,4 +34,20 @@ interface ApiService {
         @Path("projectSlug") projectSlug: String,
         @Body request: RefreshTokenRequest
     ): Response<TokenResponse>
+
+    @POST("{projectSlug}/geo-events-orm/")
+    suspend fun createGeoEventORM(
+        @Path("projectSlug") projectSlug: String,
+        @Header("Authorization") token: String?,
+        @Body request: GeoEventRequest
+    ): Response<GeoEventResponse>
+
+    @GET("{projectSlug}/geo-events-orm/")
+    suspend fun listGeoEventsORM(
+        @Path("projectSlug") projectSlug: String,
+        @Header("Authorization") token: String?,
+        @Query("user_id") userId: String? = null,
+        @Query("limit") limit: Int = 50,
+        @Query("offset") offset: Int = 0
+    ): Response<List<GeoEventResponse>>
 }

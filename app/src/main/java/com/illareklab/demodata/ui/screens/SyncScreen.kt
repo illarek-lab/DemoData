@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,11 +47,21 @@ fun SyncScreen() {
         factory = SyncViewModel.Factory(
             app.gpsRepository,
             app.mediaRepository,
-            app.audioRepository
+            app.audioRepository,
+            app.sessionManager
         )
     )
 
     val counts by vm.counts.collectAsStateWithLifecycle()
+    val isSyncing by vm.isSyncing.collectAsStateWithLifecycle()
+    val syncMessage by vm.syncMessage.collectAsStateWithLifecycle()
+    val syncProgress by vm.syncProgress.collectAsStateWithLifecycle()
+    val cloudRecords by vm.cloudRecords.collectAsStateWithLifecycle()
+    val isLoadingCloud by vm.isLoadingCloud.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        vm.refreshCloudData()
+    }
 
     Column(
         modifier = Modifier
@@ -69,30 +80,42 @@ fun SyncScreen() {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Botón Sync (sin lógica real, solo Toast) ──
+        // ── Botón Sync ──
         Button(
             onClick = {
-                Toast.makeText(
-                    context,
-                    "Por implementar",
-                    Toast.LENGTH_SHORT
-                ).show()
+                vm.sync { success ->
+                    if (success) {
+                        Toast.makeText(context, "Sincronización finalizada", Toast.LENGTH_SHORT).show()
+                    }
+                }
             },
+            enabled = !isSyncing,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
         ) {
             Icon(Icons.Default.CloudUpload, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Sincronizar ahora")
+            Text(if (isSyncing) "Sincronizando..." else "Sincronizar ahora")
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            "El servidor se integrará en una fase posterior.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline
-        )
+        if (isSyncing) {
+            Spacer(modifier = Modifier.height(8.dp))
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = { syncProgress },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        if (syncMessage != null) {
+            Text(
+                text = syncMessage!!,
+                style = MaterialTheme.typography.bodySmall,
+                color = if (syncMessage!!.contains("Error")) MaterialTheme.colorScheme.error 
+                        else MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -168,6 +191,80 @@ fun SyncScreen() {
             label = "Audios",
             count = counts.audios
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // ── Sección de Datos en la Nube ──
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Datos en la nube (Servidor)",
+                style = MaterialTheme.typography.titleSmall
+            )
+            androidx.compose.material3.TextButton(onClick = { vm.refreshCloudData() }) {
+                Text("Actualizar")
+            }
+        }
+        
+        if (isLoadingCloud) {
+            androidx.compose.material3.LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
+
+        if (cloudRecords.isEmpty() && !isLoadingCloud) {
+            Text(
+                "No hay datos registrados en el servidor para este usuario.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+        } else {
+            cloudRecords.forEach { record ->
+                CloudRecordCard(record)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun CloudRecordCard(record: com.illareklab.demodata.data.remote.model.GeoEventResponse) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    "ID: ${record.id} • ${record.eventType ?: "GPS"}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    "${record.latitude}, ${record.longitude}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    "Registrado: ${record.recordedAt}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+            Icon(
+                Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.secondary
+            )
+        }
     }
 }
 
