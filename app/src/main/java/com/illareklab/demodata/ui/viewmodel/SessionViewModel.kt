@@ -172,6 +172,31 @@ class SessionViewModel(
         }
     }
 
+    fun syncFcmToken(fcmToken: String) {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.accessToken.firstOrNull()
+                val uId = sessionManager.userId.firstOrNull()
+                val uName = sessionManager.currentUsername.firstOrNull()
+
+                if (token != null) {
+                    RetrofitClient.apiService.updateFcmToken(
+                        projectSlug = NetworkConstants.PROJECT_SLUG,
+                        token = "Bearer $token",
+                        request = DeviceTokenRequest(
+                            userId = uId,
+                            userName = uName,
+                            fcmToken = fcmToken,
+                            deviceId = sessionManager.getDeviceId()
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                // Manejar error de red
+            }
+        }
+    }
+
     class Factory(private val sessionManager: SessionManager) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
