@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "323206701755",
+    "project_id": "illarek-8bd2f",
+    "storage_bucket": "illarek-8bd2f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:323206701755:android:95de4fad2c49b1cf013f9e",
+        "android_client_info": {
+          "package_name": "com.illareklab.demodata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCriLYGshkKR_CZItVrfGQ-8b-jk-_NamU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
