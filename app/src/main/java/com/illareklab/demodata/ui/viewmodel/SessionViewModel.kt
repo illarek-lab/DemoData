@@ -7,10 +7,12 @@ import com.illareklab.demodata.data.session.SessionManager
 import com.illareklab.demodata.data.remote.NetworkConstants
 import com.illareklab.demodata.data.remote.RetrofitClient
 import com.illareklab.demodata.data.remote.model.*
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class SessionViewModel(
     private val sessionManager: SessionManager
@@ -66,6 +68,7 @@ class SessionViewModel(
                     }
 
                     sessionManager.login(email, body.accessToken, body.refreshToken, finalUserId)
+                    fetchAndSyncToken() // Sincronizar token FCM después del login
                     onResult(true)
                 } else {
                     onResult(false)
@@ -122,6 +125,7 @@ class SessionViewModel(
 
                     // Guardamos el email real en lugar de "Google User"
                     sessionManager.login(email, body.accessToken, body.refreshToken, finalUserId)
+                    fetchAndSyncToken() // Sincronizar token FCM después del login
                     onResult(true)
                 } else {
                     onResult(false)
@@ -169,6 +173,17 @@ class SessionViewModel(
     fun logout() {
         viewModelScope.launch {
             sessionManager.logout()
+        }
+    }
+
+    private fun fetchAndSyncToken() {
+        viewModelScope.launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                syncFcmToken(token)
+            } catch (e: Exception) {
+                // Error al obtener token de Firebase
+            }
         }
     }
 
