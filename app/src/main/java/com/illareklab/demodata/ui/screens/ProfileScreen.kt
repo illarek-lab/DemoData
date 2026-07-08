@@ -374,6 +374,8 @@ private fun MenuOption(icon: ImageVector, title: String, subtitle: String, onCli
 private fun MyProfileScreen(username: String?, sessionVm: SessionViewModel, onBack: () -> Unit) {
     val isDarkModePref by sessionVm.isDarkMode.collectAsStateWithLifecycle()
     val userId by sessionVm.userId.collectAsStateWithLifecycle()
+    val notificationsEnabled by sessionVm.notificationsEnabled.collectAsStateWithLifecycle()
+    
     val isDark = isDarkModePref ?: isSystemInDarkTheme()
     Column(modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState())) {
         Text("Mi Perfil", style = MaterialTheme.typography.headlineSmall)
@@ -382,6 +384,7 @@ private fun MyProfileScreen(username: String?, sessionVm: SessionViewModel, onBa
         ProfileMetadataItem("User ID (UUID)", userId ?: "Cargando...")
         ProfileMetadataItem("Rol", "Administrador / Operador")
         ProfileMetadataItem("Directorio Local", LocalContext.current.filesDir.absolutePath)
+        
         Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.DarkMode, null, tint = MaterialTheme.colorScheme.primary)
@@ -393,7 +396,23 @@ private fun MyProfileScreen(username: String?, sessionVm: SessionViewModel, onBa
             }
             Switch(checked = isDark, onCheckedChange = { sessionVm.setDarkMode(it) })
         }
+        
         HorizontalDivider()
+
+        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Notifications, null, tint = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text("Notificaciones Globales", style = MaterialTheme.typography.titleMedium)
+                    Text("Recibir avisos de all_users", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Switch(checked = notificationsEnabled, onCheckedChange = { sessionVm.setNotificationsEnabled(it) })
+        }
+
+        HorizontalDivider()
+
         Spacer(modifier = Modifier.height(16.dp))
         val androidId = android.provider.Settings.Secure.getString(
             LocalContext.current.contentResolver,

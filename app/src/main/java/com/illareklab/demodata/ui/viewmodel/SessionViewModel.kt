@@ -42,6 +42,12 @@ class SessionViewModel(
         initialValue = null // null significa que usará el del sistema
     )
 
+    val notificationsEnabled = sessionManager.notificationsEnabled.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = true
+    )
+
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
@@ -167,6 +173,17 @@ class SessionViewModel(
     fun setDarkMode(enabled: Boolean) {
         viewModelScope.launch {
             sessionManager.setDarkMode(enabled)
+        }
+    }
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            sessionManager.setNotificationsEnabled(enabled)
+            if (enabled) {
+                FirebaseMessaging.getInstance().subscribeToTopic("all_users")
+            } else {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("all_users")
+            }
         }
     }
 

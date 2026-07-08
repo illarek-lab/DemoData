@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.illareklab.demodata.ui.Navigation
 import com.illareklab.demodata.ui.theme.AppTheme
 import com.illareklab.demodata.ui.viewmodel.SessionViewModel
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : ComponentActivity() {
 
@@ -40,6 +41,8 @@ class MainActivity : ComponentActivity() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
+                // Nos suscribimos al tema global para recibir notificaciones masivas
+                FirebaseMessaging.getInstance().subscribeToTopic("all_users")
             }
 
             AppTheme(darkTheme = darkTheme) {
